@@ -11,7 +11,7 @@ mid.tracks.append(track)
 channel = 9
 KICK, SNARE, HIHAT = 36, 38, 42
 BASE_VELOCITY = 80
-KICK_VELOCITY = min(127, round(BASE_VELOCITY * 1.12))
+KICK_VELOCITY = round(BASE_VELOCITY * 1.3)
 
 STEPS_PER_BEAT = 4
 
