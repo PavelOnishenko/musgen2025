@@ -1,5 +1,6 @@
 import mido
 from mido import MidiFile, MidiTrack, Message
+from uuid import uuid4
 
 mid = MidiFile()
 track = MidiTrack()
@@ -43,5 +44,6 @@ for bar in range(4):
         if rest > 0:
             track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))
 
-mid.save("drums_1_32.mid")
-print("✅ Сохранено: drums_1_32.mid")
+file_name = f"drums_{uuid4().hex}.mid"
+mid.save(file_name)
+print(f"✅ Сохранено: {file_name}")
