@@ -16,6 +16,7 @@ STEPS_PER_BEAT = 4
 ticks_per_beat = mid.ticks_per_beat
 note_len = ticks_per_beat // STEPS_PER_BEAT
 
+
 def tick(notes):
     if notes:
         for n in notes:
@@ -28,51 +29,68 @@ def tick(notes):
         track.append(Message('note_on', note=0, velocity=0, time=note_len, channel=channel))
 
 
-def generate_basic_sequence(bars=4, steps_per_beat=STEPS_PER_BEAT):
-    """Generate a simple but varied drum sequence.
-
-    The pattern aims for a straightforward 4/4 groove with a steady hi-hat,
-    kicks on the downbeats, and snares on beats two and four. Randomness is
-    introduced to create variation while keeping the groove coherent.
-    """
-
+def generate_basic_bar(steps_per_beat=STEPS_PER_BEAT):
+    """Return a bar using the structured groove pattern."""
     steps_per_bar = steps_per_beat * 4
-    total_steps = bars * steps_per_bar
-    sequence = []
-
-    for step in range(total_steps):
+    bar = []
+    for step in range(steps_per_bar):
         events = []
         beat_position = step % steps_per_bar
-        beat_index = beat_position // steps_per_beat  # 0-3 within the bar
+        beat_index = beat_position // steps_per_beat
         step_in_beat = beat_position % steps_per_beat
-
-        # Hi-hat keeps time on almost every subdivision to anchor the groove.
         hihat_chance = 1.0 if step_in_beat == 0 else 0.85
         if random.random() < hihat_chance:
             events.append(HIHAT)
-
-        # Solid kick on beat one of every bar.
         if beat_index == 0 and step_in_beat == 0:
             events.append(KICK)
         else:
-            # Additional kicks on beat three and off-beats with some randomness.
             if beat_index == 2 and step_in_beat == 0 and random.random() < 0.8:
                 events.append(KICK)
             elif step_in_beat in (0, 2) and random.random() < 0.25:
                 events.append(KICK)
-
-        # Snare backbeat on beats two and four, with occasional extra hits.
         if beat_index in (1, 3) and step_in_beat == 0:
             events.append(SNARE)
         elif beat_index == 1 and step_in_beat == 2 and random.random() < 0.2:
             events.append(SNARE)
+        bar.append(events)
+    return bar
 
-        sequence.append(events)
 
+def generate_chaos_bar(steps_per_beat=STEPS_PER_BEAT):
+    """Return a bar with randomized hit counts and placements."""
+    steps_per_bar = steps_per_beat * 4
+    bar = [[] for _ in range(steps_per_bar)]
+
+    def place_random_hits(note, count):
+        if count <= 0:
+            return
+        count = min(count, steps_per_bar)
+        indices = random.sample(range(steps_per_bar), count)
+        for idx in indices:
+            bar[idx].append(note)
+
+    kick_hits = random.randint(0, steps_per_beat)
+    snare_hits = random.randint(0, steps_per_beat)
+    hihat_hits = random.randint(steps_per_beat, steps_per_bar)
+
+    place_random_hits(KICK, kick_hits)
+    place_random_hits(SNARE, snare_hits)
+    place_random_hits(HIHAT, hihat_hits)
+
+    return bar
+
+
+def generate_sequence(bars=4, steps_per_beat=STEPS_PER_BEAT):
+    """Generate a drum sequence selecting a mode per bar."""
+    modes = (generate_basic_bar, generate_chaos_bar)
+    sequence = []
+    for _ in range(bars):
+        generator = random.choice(modes)
+        sequence.extend(generator(steps_per_beat=steps_per_beat))
     return sequence
 
 
-sequence = generate_basic_sequence()
+sequence = generate_sequence()
 
 for events in sequence:
     tick(events)
