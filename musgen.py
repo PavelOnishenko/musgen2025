@@ -34,14 +34,14 @@ for bar in range(4):
 
         rest = eighth - note_len
         if rest > 0:
-            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))  # пустышка
+            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))
 
         track.append(Message('note_on', note=HIHAT, velocity=60, time=0, channel=channel))
         track.append(Message('note_off', note=HIHAT, velocity=0, time=note_len, channel=channel))
 
         rest = eighth - note_len
         if rest > 0:
-            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))  # пустышка
+            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))
 
 mid.save("drums_1_32.mid")
 print("✅ Сохранено: drums_1_32.mid")
