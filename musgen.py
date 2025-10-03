@@ -10,6 +10,8 @@ mid.tracks.append(track)
 
 channel = 9
 KICK, SNARE, HIHAT = 36, 38, 42
+BASE_VELOCITY = 80
+KICK_VELOCITY = min(127, round(BASE_VELOCITY * 1.12))
 
 STEPS_PER_BEAT = 4
 
@@ -20,7 +22,8 @@ note_len = ticks_per_beat // STEPS_PER_BEAT
 def tick(notes):
     if notes:
         for n in notes:
-            track.append(Message('note_on', note=n, velocity=80, time=0, channel=channel))
+            velocity = KICK_VELOCITY if n == KICK else BASE_VELOCITY
+            track.append(Message('note_on', note=n, velocity=velocity, time=0, channel=channel))
         for i, n in enumerate(notes):
             track.append(Message('note_off', note=n, velocity=0,
                                  time=note_len if i == 0 else 0,
