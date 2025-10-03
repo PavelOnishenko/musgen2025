@@ -29,13 +29,6 @@ def tick(notes):
 
 
 def generate_basic_sequence(bars=4, steps_per_beat=STEPS_PER_BEAT):
-    """Generate a simple but varied drum sequence.
-
-    The pattern aims for a straightforward 4/4 groove with a steady hi-hat,
-    kicks on the downbeats, and snares on beats two and four. Randomness is
-    introduced to create variation while keeping the groove coherent.
-    """
-
     steps_per_bar = steps_per_beat * 4
     total_steps = bars * steps_per_bar
     sequence = []
