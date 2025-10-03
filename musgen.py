@@ -1,47 +1,38 @@
 import mido
 from mido import MidiFile, MidiTrack, Message
+from uuid import uuid4
 
 mid = MidiFile()
 track = MidiTrack()
 mid.tracks.append(track)
 
-channel = 9 
+channel = 9
 KICK, SNARE, HIHAT = 36, 38, 42
 
 ticks_per_beat = mid.ticks_per_beat
 note_len = ticks_per_beat // 8
-eighth = ticks_per_beat // 2
 
-for bar in range(4):
-    for beat in range(4):
-        
-        track.append(Message('note_on', note=HIHAT, velocity=70, time=0, channel=channel))
-        
-        if beat in [0, 2]: 
-            track.append(Message('note_on', note=KICK, velocity=100, time=0, channel=channel))
+def tick(notes):
+    if notes:
+        for n in notes:
+            track.append(Message('note_on', note=n, velocity=80, time=0, channel=channel))
+        for i, n in enumerate(notes):
+            track.append(Message('note_off', note=n, velocity=0,
+                                 time=note_len if i == 0 else 0,
+                                 channel=channel))
+    else:
+        track.append(Message('note_on', note=0, velocity=0, time=note_len, channel=channel))
 
-        if beat in [1, 3]:
-            track.append(Message('note_on', note=SNARE, velocity=100, time=0, channel=channel))
-        
-        track.append(Message('note_off', note=HIHAT, velocity=0, time=note_len, channel=channel))
+sequence = [
+    [HIHAT, KICK], [], [], [],
+    [HIHAT], [], [], [],
+    [HIHAT, SNARE], [], [], [],
+    [HIHAT], [], [], []
+] * 4
 
-        if beat in [0, 2]: 
-            track.append(Message('note_off', note=KICK, velocity=0, time=0, channel=channel))
-            
-        if beat in [1, 3]:
-            track.append(Message('note_off', note=SNARE, velocity=0, time=0, channel=channel))
-            
+for events in sequence:
+    tick(events)
 
-        rest = eighth - note_len
-        if rest > 0:
-            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))
-
-        track.append(Message('note_on', note=HIHAT, velocity=60, time=0, channel=channel))
-        track.append(Message('note_off', note=HIHAT, velocity=0, time=note_len, channel=channel))
-
-        rest = eighth - note_len
-        if rest > 0:
-            track.append(Message('note_on', note=HIHAT, velocity=0, time=rest, channel=channel))
-
-mid.save("drums_1_32.mid")
-print("✅ Сохранено: drums_1_32.mid")
+file_name = f"drums_{uuid4().hex}.mid"
+mid.save(file_name)
+print(f"✅ Сохранено: {file_name}")
